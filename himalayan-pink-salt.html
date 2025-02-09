@@ -38,7 +38,6 @@
       color: var(--primary-blue);
       margin-top: 0;
     }
-    /* UL with bullet points and extra bottom margin */
     .text-content ul {
       list-style-type: disc;
       padding-left: 20px;
@@ -47,11 +46,10 @@
     .text-content ul li {
       margin-bottom: 0.5rem;
     }
-    /* Extra top margin for paragraphs */
     .text-content p {
       margin-top: 1.5rem;
     }
-    /* Collage container for multi-image sections */
+    /* Desktop collage styles */
     .image-content {
       width: 400px;
       height: 400px;
@@ -66,18 +64,15 @@
       border-radius: 8px;
       overflow: hidden;
     }
-    /* Pointer cursor for clickable containers */
     .collage-container, .single-image-container {
       cursor: pointer;
     }
-    /* Wrapper for each image (for both grid and modal) */
     .img-wrapper {
       position: absolute;
       cursor: pointer;
       border-radius: inherit;
       overflow: hidden;
     }
-    /* Base image inside wrapper */
     .img-wrapper .base-image {
       width: 100%;
       height: 100%;
@@ -86,7 +81,6 @@
       border-radius: inherit;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    /* Logo overlay at upper-right for grid images */
     .img-wrapper .logo-overlay {
       position: absolute;
       top: 8px;
@@ -95,19 +89,19 @@
       height: auto;
       pointer-events: none;
     }
-    /* Hover effect */
     .img-wrapper:hover .base-image {
       transform: scale(1.03);
       box-shadow: 0 0 10px rgba(0,45,114,0.7);
       z-index: 9999;
     }
-    /* Positioning for collage images */
+    /* Collage image positions on desktop */
     .img1 { top: 0; left: 0; width: 260px; height: 260px; z-index: 1; }
     .img2 { top: 0; right: 0; width: 140px; height: 280px; z-index: 3; }
     .img3 { bottom: 0; left: 0; width: 400px; height: 200px; z-index: 2; transform: translateY(-30px); }
-    /* Modal styles */
+
+    /* Modal styles (unchanged) */
     .modal {
-      display: none; /* Hidden by default */
+      display: none;
       position: fixed; 
       z-index: 10000;
       left: 0;
@@ -127,7 +121,6 @@
       border-radius: 8px;
       overflow: hidden;
     }
-    /* Container holding the dynamic image */
     #modalImageContainer {
       width: 100%;
       height: 100%;
@@ -136,7 +129,6 @@
       align-items: center;
       justify-content: center;
     }
-    /* The image in the modal */
     .modal-img-wrapper .base-image {
       max-width: 100%;
       max-height: 100%;
@@ -144,7 +136,6 @@
       height: auto;
       display: block;
     }
-    /* Centered logo overlay on the modal image */
     .modal-img-wrapper .logo-overlay {
       position: absolute;
       top: 50%;
@@ -154,7 +145,6 @@
       height: auto;
       pointer-events: none;
     }
-    /* Bottom overlay with gradient and text */
     .modal-overlay {
       position: absolute;
       bottom: 0;
@@ -166,7 +156,6 @@
       padding: 10px;
       box-sizing: border-box;
     }
-    /* Arrow buttons */
     .prev-btn, .next-btn {
       position: absolute;
       top: 50%;
@@ -189,6 +178,56 @@
     }
     .prev-btn { left: 20px; }
     .next-btn { right: 20px; }
+
+    /* Mobile-friendly styles */
+    @media (max-width: 768px) {
+      /* Stack the section content vertically */
+      .section {
+        flex-direction: column;
+      }
+      .text-content {
+        padding-right: 0;
+        margin-bottom: 1rem;
+      }
+      /* Make the image container full-width */
+      .image-content {
+        width: 100%;
+        height: auto;
+      }
+      /* Override the collage layout so images display in a simple column */
+      .collage-container {
+        position: relative;
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      .img-wrapper {
+        position: relative;
+        width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+      }
+      .img-wrapper .base-image {
+        width: 100%;
+        height: auto;
+      }
+      /* Remove desktop-specific absolute positioning */
+      .img1, .img2, .img3 {
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        width: 100%;
+        height: auto;
+        transform: none;
+      }
+      /* Optional: Adjust modal content for smaller screens */
+      .modal-content {
+        width: 95%;
+        height: auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -429,12 +468,9 @@
   <!-- Modal Popup -->
   <div id="popupModal" class="modal">
     <div class="modal-content">
-      <!-- Dynamic image container -->
       <div id="modalImageContainer"></div>
-      <!-- Navigation arrow buttons -->
       <span id="prevBtn" class="prev-btn" onclick="prevImage()"><</span>
       <span id="nextBtn" class="next-btn" onclick="nextImage()">></span>
-      <!-- Bottom overlay with gradient and text -->
       <div class="modal-overlay">
          <h3 id="overlayHeading">Default Heading</h3>
          <p id="overlayText">Default paragraph text goes here.</p>
@@ -449,12 +485,11 @@
     let modalCurrentIndex = 0;
     
     // Open the modal for a group of images.
-    // 'clickedWrapper' is the .img-wrapper element that was clicked.
     function openModalGroup(clickedWrapper) {
-      // Determine the group container.
+      // Get the group container
       const groupContainer = clickedWrapper.parentNode;
       
-      // Update modal overlay text based on the container's data attributes.
+      // Update modal overlay text based on data attributes
       const overlayHeading = groupContainer.getAttribute('data-overlay-heading');
       const overlayText = groupContainer.getAttribute('data-overlay-text');
       if (overlayHeading) {
@@ -464,20 +499,22 @@
         document.getElementById('overlayText').innerText = overlayText;
       }
       
-      // Get all .img-wrapper elements in the group.
+      // Gather all image URLs from this group
       const wrappers = groupContainer.querySelectorAll('.img-wrapper');
       modalGroupImages = [];
       wrappers.forEach((wrapper) => {
         const img = wrapper.querySelector('.base-image');
         modalGroupImages.push(img.src);
       });
+      
+      // Set the current index to the clicked image
       const clickedImg = clickedWrapper.querySelector('.base-image');
       modalCurrentIndex = modalGroupImages.indexOf(clickedImg.src);
       
       showModalImage(modalGroupImages[modalCurrentIndex]);
     }
     
-    // Display the image in the modal.
+    // Display the selected image in the modal
     function showModalImage(src) {
       const modalImageContainer = document.getElementById('modalImageContainer');
       modalImageContainer.innerHTML = '';
@@ -519,7 +556,6 @@
       showModalImage(modalGroupImages[modalCurrentIndex]);
     }
     
-    // Update arrow visibility based on the current image index.
     function updateArrowVisibility() {
       const prevBtn = document.getElementById('prevBtn');
       const nextBtn = document.getElementById('nextBtn');
@@ -540,7 +576,7 @@
       }
     }
     
-    // Close the modal if clicking outside the modal content.
+    // Close the modal when clicking outside the modal content
     window.onclick = function(event) {
       const modal = document.getElementById('popupModal');
       if (event.target == modal) {
